@@ -3,6 +3,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { onMount } from 'svelte';
 	import { reveal } from '#lib/transitions/reveal.ts';
+	import ResultBars from '#lib/components/ResultBars.svelte';
 
 	let { data }: { data: { poll: Poll } } = $props();
 
@@ -56,38 +57,42 @@
 			<span>closes {poll.deadline.slice(0, 10)}</span>
 		</p>
 
-		<div class="options" role="group" aria-label="Poll options">
-			{#each poll.options as option (option.id)}
-				{#if poll.type === 'rating'}
-					<button
-						type="button"
-						class="option rating"
-						class:selected={selectedIds.has(option.id)}
-						aria-pressed={selectedIds.has(option.id)}
-						disabled={hasVoted}
-						onclick={() => selectOption(option.id)}
-					>
-						{'★'.repeat(option.id)} <span class="sr-only">Rate {option.id} out of 5</span>
-					</button>
-				{:else}
-					<button
-						type="button"
-						class="option"
-						class:selected={selectedIds.has(option.id)}
-						aria-pressed={selectedIds.has(option.id)}
-						disabled={hasVoted}
-						onclick={() => selectOption(option.id)}
-					>
-						<span class="label">{option.text}</span>
-					</button>
-				{/if}
-			{/each}
-		</div>
+		{#if !hasVoted}
+			<div class="options" role="group" aria-label="Poll options">
+				{#each poll.options as option (option.id)}
+					{#if poll.type === 'rating'}
+						<button
+							type="button"
+							class="option rating"
+							class:selected={selectedIds.has(option.id)}
+							aria-pressed={selectedIds.has(option.id)}
+							disabled={hasVoted}
+							onclick={() => selectOption(option.id)}
+						>
+							{'★'.repeat(option.id)} <span class="sr-only">Rate {option.id} out of 5</span>
+						</button>
+					{:else}
+						<button
+							type="button"
+							class="option"
+							class:selected={selectedIds.has(option.id)}
+							aria-pressed={selectedIds.has(option.id)}
+							disabled={hasVoted}
+							onclick={() => selectOption(option.id)}
+						>
+							<span class="label">{option.text}</span>
+						</button>
+					{/if}
+				{/each}
+			</div>
+		{:else}
+			<div in:reveal>
+				<ResultBars {poll} />
+			</div>
+		{/if}
 
 		{#if !hasVoted}
-			<button type="button" class="vote" disabled={!canVote} onclick={vote}>Vote</button>
-		{:else}
-			<p role="status" class="voted" in:reveal>You voted. Thank you!</p>
+			<button type="button" class="vote" disabled={!canVote} onclick={vote} out:reveal>Vote</button>
 		{/if}
 	</div>
 {/if}
@@ -139,11 +144,6 @@
 		border: none;
 		border-radius: 6px;
 		cursor: pointer;
-		margin-bottom: 1rem;
-	}
-	.voted {
-		color: #16a34a;
-		font-weight: 600;
 		margin-bottom: 1rem;
 	}
 </style>
