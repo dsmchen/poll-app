@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fetchPolls } from '#lib/data/api.ts';
 	import PollCard from '#lib/components/PollCard.svelte';
+	import { reveal } from '#lib/transitions/reveal.ts';
 
 	let pollsPromise = $state(fetchPolls());
 </script>
@@ -10,9 +11,11 @@
 {#await pollsPromise}
 	<p class="loading" role="status">Loading polls...</p>
 {:then pollList}
-	<ul class="poll-list" role="list">
+	<ul class="poll-list" role="list" in:reveal>
 		{#each pollList as poll (poll.id)}
-			<li><PollCard {poll} /></li>
+			<li>
+				<PollCard {poll} onOpen={() => (location.href = `/poll/${poll.id}`)} />
+			</li>
 		{/each}
 	</ul>
 {:catch error}

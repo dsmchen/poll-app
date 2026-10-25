@@ -4,3 +4,9 @@ body {
 	margin: 2rem auto;
 	padding: 0 1rem;
 }
+
+:focus-visible {
+	outline: 2px solid #3b62f0;
+	outline-offset: 2px;
+	border-radius: 8px;
+}
